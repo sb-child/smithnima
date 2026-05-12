@@ -264,8 +264,12 @@ where
                 let active_text_input_id = &mut guard.active_text_input_id;
 
                 if active_text_input_id.is_some() && *active_text_input_id != Some(resource.id()) {
-                    debug!("discarding text_input request since we already have an active one");
-                    return;
+                    if new_state.enable == Some(true) {
+                        debug!("allowing new text_input instance to steal active status");
+                    } else {
+                        debug!("discarding text_input request since we already have an active one");
+                        return;
+                    }
                 }
 
                 match new_state.enable {
