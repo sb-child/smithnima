@@ -266,6 +266,7 @@ where
                 if active_text_input_id.is_some() && *active_text_input_id != Some(resource.id()) {
                     if new_state.enable == Some(true) {
                         debug!("allowing new text_input instance to steal active status");
+                        resource.enter(&focus);
                     } else {
                         debug!("discarding text_input request since we already have an active one");
                         return;
