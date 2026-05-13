@@ -1,7 +1,7 @@
 use std::mem;
 use std::sync::{Arc, Mutex};
 
-use tracing::{debug, info, trace};
+use tracing::{debug, info, trace, warn};
 use wayland_protocols::wp::text_input::zv3::server::zwp_text_input_v3::{
     self, ChangeCause, ContentHint, ContentPurpose, ZwpTextInputV3,
 };
@@ -259,27 +259,27 @@ where
                 pending_state.cursor_rectangle = Some(Rectangle::new((x, y).into(), (width, height).into()));
             }
             zwp_text_input_v3::Request::Commit => {
-                trace!("[meow] zwp_text_input_v3::Request::Commit");
+                warn!("[meow] zwp_text_input_v3::Request::Commit");
                 let mut new_state = mem::take(pending_state);
                 let _ = pending_state;
                 let active_text_input_id = &mut guard.active_text_input_id;
 
                 let is_stealing =
                     active_text_input_id.is_some() && *active_text_input_id != Some(resource.id());
-                trace!("[meow] zwp_text_input_v3::Request::Commit is_stealing={is_stealing}");
+                warn!("[meow] zwp_text_input_v3::Request::Commit is_stealing={is_stealing}");
                 if is_stealing {
                     if new_state.enable == Some(true) {
-                        trace!("[meow] zwp_text_input_v3::Request::Commit new_state.enable=true");
+                        warn!("[meow] zwp_text_input_v3::Request::Commit new_state.enable=true");
                         debug!("allowing new text_input instance to steal active status");
                     } else {
-                        trace!("[meow] zwp_text_input_v3::Request::Commit new_state.enable=false or None");
+                        warn!("[meow] zwp_text_input_v3::Request::Commit new_state.enable=false or None");
                         debug!("discarding text_input request since we already have an active one");
                         return;
                     }
                 }
 
                 if new_state.enable == Some(true) && *active_text_input_id != Some(resource.id()) {
-                    trace!(
+                    warn!(
                         "[meow] zwp_text_input_v3::Request::Commit new_state.enable=true, active_text_input_id={active_text_input_id:?}, resource.id()={:?}",
                         resource.id()
                     );
@@ -288,14 +288,14 @@ where
 
                 match new_state.enable {
                     Some(true) => {
-                        trace!("[meow] zwp_text_input_v3::Request::Commit match new_state.enable=true");
+                        warn!("[meow] zwp_text_input_v3::Request::Commit match new_state.enable=true");
                         *active_text_input_id = Some(resource.id());
                         // Drop the guard before calling to other subsystem.
                         drop(guard);
                         self.input_method_handle.activate_input_method(state, &focus);
                     }
                     Some(false) => {
-                        trace!("[meow] zwp_text_input_v3::Request::Commit match new_state.enable=false");
+                        warn!("[meow] zwp_text_input_v3::Request::Commit match new_state.enable=false");
                         *active_text_input_id = None;
                         // Drop the guard before calling to other subsystem.
                         drop(guard);
@@ -303,7 +303,7 @@ where
                         return;
                     }
                     None => {
-                        trace!("[meow] zwp_text_input_v3::Request::Commit match new_state.enable=None");
+                        warn!("[meow] zwp_text_input_v3::Request::Commit match new_state.enable=None");
                         if *active_text_input_id != Some(resource.id()) {
                             debug!("discarding text_input requests before enabling it");
                             return;
@@ -333,7 +333,7 @@ where
                 }
 
                 if let Some(rect) = new_state.cursor_rectangle.take() {
-                    trace!(
+                    warn!(
                         "[meow] zwp_text_input_v3::Request::Commit match new_state.cursor_rectangle={rect:?}"
                     );
                     self.input_method_handle
