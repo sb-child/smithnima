@@ -263,7 +263,9 @@ where
                 let _ = pending_state;
                 let active_text_input_id = &mut guard.active_text_input_id;
 
-                if active_text_input_id.is_some() && *active_text_input_id != Some(resource.id()) {
+                let is_stealing =
+                    active_text_input_id.is_some() && *active_text_input_id != Some(resource.id());
+                if is_stealing {
                     if new_state.enable == Some(true) {
                         debug!("allowing new text_input instance to steal active status");
                     } else {
