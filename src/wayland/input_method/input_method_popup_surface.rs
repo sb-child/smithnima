@@ -27,11 +27,11 @@ pub struct PopupSurface {
     pub surface_role: ZwpInputPopupSurfaceV2,
     surface: WlSurface,
     /// Protected cursor area.
-    pub(crate) rectangle: Arc<Mutex<Rectangle<i32, Logical>>>,
+    pub rectangle: Arc<Mutex<Rectangle<i32, Logical>>>,
     /// Location of the popup surface.
-    location: Arc<Mutex<Point<i32, Logical>>>,
+    pub location: Arc<Mutex<Point<i32, Logical>>>,
     /// Current parent of the IME popup.
-    parent: Option<PopupParent>,
+    pub parent: Option<PopupParent>,
 }
 
 impl PopupSurface {
