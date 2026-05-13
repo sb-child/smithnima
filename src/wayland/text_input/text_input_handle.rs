@@ -324,6 +324,8 @@ where
                 if let Some(rect) = new_state.cursor_rectangle.take() {
                     self.input_method_handle
                         .set_text_input_rectangle::<D>(state, rect);
+                    // fuck you chromium
+                    state.text_input_rectangle_changed(&focus);
                 }
 
                 self.input_method_handle.with_instance(|input_method| {

@@ -163,6 +163,13 @@ pub trait SeatHandler: Sized {
 
     /// Callback that will be notified whenever the keyboard led state changes.
     fn led_state_changed(&mut self, _seat: &Seat<Self>, _led_state: LedState) {}
+
+    /// Callback that will be notified whenever the text input rectangle changes.
+    fn text_input_rectangle_changed(
+        &mut self,
+        _surface: &crate::reexports::wayland_server::protocol::wl_surface::WlSurface,
+    ) {
+    }
 }
 /// Delegate type for all [Seat] globals.
 ///
